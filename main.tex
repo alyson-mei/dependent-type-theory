@@ -1,0 +1,198 @@
+\documentclass[12pt]{article}
+% Page setup
+\usepackage[margin=1in]{geometry}
+\usepackage{parskip}
+\usepackage{titling}
+\setlength{\droptitle}{-6em} 
+
+% Math packages
+\usepackage{amsmath, amsthm, amssymb, amsfonts, stmaryrd}
+\usepackage{mathtools}
+\makeatletter
+\g@addto@macro\th@plain{\normalfont} % remove italics from theorems (plain style)
+\makeatother
+
+% Commutative diagrams
+\usepackage{tikz-cd}
+\usepackage{proof}
+
+\usepackage{hyperref}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=cyan,
+    citecolor=green,
+    allcolors=blue
+}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{remark}[theorem]{Remark}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{exercise}[theorem]{Exercise}
+
+% Useful commands for category theory
+
+
+\newcommand{\mc}{\mathcal}
+\newcommand{\ini}{\operatorname{ini}}
+\newcommand{\ter}{\operatorname{ter}}
+\newcommand{\cod}{\operatorname{cod}}
+\newcommand{\dom}{\operatorname{dom}}
+
+\newcommand{\List}{\operatorname{List}}
+\newcommand{\lop}{\operatorname{[ \ ]}}
+\newcommand{\len}{\operatorname{len}}
+\newcommand{\type}{\operatorname{type}}
+
+\newcommand{\Exc}{\operatorname{Exception}}
+
+\newcommand{\Kl}{\operatorname{Kl}}
+\newcommand{\plus}{\operatorname{+}}
+
+\newcommand{\Cat}{\mathcal{C}at}
+\newcommand{\Vect}{\mathrm{Vect}_\mathbf{k}}
+\newcommand{\Hom}{\operatorname{Hom}}
+\newcommand{\Nat}{\operatorname{Nat}}
+\newcommand{\id}{\mathrm{id}}
+\newcommand{\op}{\mathrm{op}}
+\newcommand{\obj}{\operatorname{obj}}
+\newcommand{\arr}{\operatorname{arr}}
+\newcommand{\adj}{\operatorname{adj}}
+\newcommand{\coadj}{\operatorname{coadj}}
+\newcommand{\colim}{\operatorname*{colim}}
+
+% Arrows
+\newcommand{\ra}{\rightarrow}
+\newcommand{\from}{\leftarrow}
+\newcommand{\To}{\Rightarrow}
+\newcommand{\xto}{\xrightarrow}
+\newcommand{\xfrom}{\xleftarrow}
+
+\renewcommand{\labelitemi}{--} % Level 1: Dashes
+\renewcommand{\labelitemii}{$\circ$} % Level 2: Circles
+\renewcommand{\labelitemiii}{$\bullet$} % Level 3: Bullets (default)
+\newcommand{\andd}{\mathbin{\&}}
+
+
+\title{Notes on Dependent Type Theory}
+\author{Alyson Mei}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+These notes are based on \href{https://www.youtube.com/watch?v=y-lX1mx5_i0&list=PLt7hcIEdZLAnbUxKaG7XIynEWrozOBtXU}{video recordings} of R. Harper's lectures.
+
+\section{Introduction}
+
+Boolean algebra is associated with classical logic, Heyting algebra -- with intuitionistic logic.
+
+\begin{definition}[Boolean algebra]
+A Boolean algebra can be defined as a complemented distributive lattice:
+\begin{itemize}
+    \item[$\bullet$] Pre-order:
+    $$ x \leq x, \qquad x \leq y \andd y \leq z \to x \leq z; $$
+    \item[$\bullet$] Has finite meets and joins:
+    $$x \leq 1, \qquad z \leq x \andd z \leq y \to z \leq (x \wedge y), \qquad x \wedge y \leq x, \qquad x \wedge y \leq y;$$
+    $$0 \leq x, \qquad x \leq z \andd y \leq z \to x \vee y \leq z, \qquad x \leq x \vee y, \qquad y \leq x \vee y;$$
+    \item[$\bullet$] Has complements:
+    $$1 \leq \bar{x} \vee x, \qquad \bar{x} \wedge x \leq 0;$$  
+    \item[$\bullet$] Distributive:
+    $$x \wedge (y \vee z) \equiv (x \wedge y) \vee (x \wedge z), \qquad
+      x \vee (y \wedge z) \equiv (x \vee y) \wedge (x \vee z).$$
+\end{itemize}
+
+Additionally, the exponential is defined as
+$$y^x := \bar{x} \vee y.$$
+\end{definition}
+
+\begin{definition}[Heyting algebra]
+A Heyting algebra is defined as a lattice with exponentials:
+\begin{itemize}
+    \item[$\bullet$] Pre-order;
+    \item[$\bullet$] Has finite meets and joins;
+    \item[$\bullet$] Has exponentials:
+    $$y^x \wedge x \leq y, \qquad z \wedge x \leq y \to z \leq y^x.$$
+\end{itemize}
+\end{definition}
+
+\begin{exercise}
+\hfill
+\begin{enumerate}
+    \item ``Yoneda lemma'': $x \leq y$ iff $\forall z \ (z \leq x \to z \leq y)$;
+    \item Every Heyting algebra is distributive.
+\end{enumerate}
+\end{exercise}
+
+Quotes:
+\begin{itemize}
+    \item ``Boolean algebra (closed world) = Heyting algebra (open world) with complements'';
+    \item ``Classical logic is a logic with complete information''.
+\end{itemize}
+
+The definitions provide us with standard rules:
+\begin{itemize}
+    \item Weakening:
+    $$x \leq x \vee y \qquad (x \wedge y \leq x);$$
+    \item Contraction:
+    $$x \leq x \wedge x;$$
+    \item Exchange:
+    $$x \wedge y \equiv y \wedge x.$$
+\end{itemize}
+
+\textbf{Relation to classical logic}:
+\begin{itemize}
+    \item Sequent $\Gamma \vdash A$, where $\Gamma = A_1, \dots, A_n$, corresponds to:
+    $$A_1 \wedge \dots \wedge A_n \leq A;$$
+    \item Rules for $\wedge$:
+    \begin{center}
+        \begin{tabular}{ccc}
+        $\displaystyle \infer{\Gamma \vdash A \wedge B}{\Gamma \vdash A & \Gamma \vdash B}$ 
+        &
+        $\displaystyle \infer{\Gamma, A \wedge B \vdash A}{}$
+        &
+        $\displaystyle \infer{\Gamma, A \wedge B \vdash B}{}$
+        \text{;}
+        \end{tabular}
+    \end{center}
+    \item ...and so on.
+\end{itemize}
+
+\begin{definition}[Lindenbaum algebra]
+A Lindenbaum algebra is defined as the algebra of equivalence classes of a given theory:
+\begin{itemize}
+    \item[$\bullet$] $[A] = \lbrace B \mid B \equiv A \rbrace;$ 
+    \item[$\bullet$] $[A] \wedge [B] := [A \wedge B];$
+    \item ... and so on.
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Soundness and Completeness for Intuitionistic Propositional Logic]
+Let $\Gamma$ be a context and $A$ a formula. Then
+\[
+\Gamma \vdash A
+\quad \text{iff} \quad
+\forall H \;
+\bigl(
+\llbracket \Gamma \rrbracket_H \leq \llbracket A \rrbracket_H
+\bigr),
+\]
+where $H$ ranges over all Heyting algebras, and
+$\llbracket - \rrbracket_H$ denotes the interpretation of formulas as elements
+of $H$ under a valuation of propositional variables.
+\end{theorem}
+
+
+
+
+\end{document}
