@@ -70,6 +70,14 @@
 \newcommand{\coadj}{\operatorname{coadj}}
 \newcommand{\colim}{\operatorname*{colim}}
 
+\newcommand{\abort}{\operatorname{abort}}
+\newcommand{\fst}{\operatorname{fst}}
+\newcommand{\snd}{\operatorname{snd}}
+\newcommand{\inl}{\operatorname{inl}}
+\newcommand{\inr}{\operatorname{inr}}
+\newcommand{\case}{\operatorname{case}}
+
+
 % Arrows
 \newcommand{\ra}{\rightarrow}
 \newcommand{\from}{\leftarrow}
@@ -81,7 +89,7 @@
 \renewcommand{\labelitemii}{$\circ$} % Level 2: Circles
 \renewcommand{\labelitemiii}{$\bullet$} % Level 3: Bullets (default)
 \newcommand{\andd}{\mathbin{\&}}
-
+\newcommand{\dash}{\textrm{-}}
 
 \title{Notes on Dependent Type Theory}
 \author{Alyson Mei}
@@ -98,7 +106,7 @@ These notes are based on \href{https://www.youtube.com/watch?v=y-lX1mx5_i0&list=
 Boolean algebra is associated with classical logic, Heyting algebra -- with intuitionistic logic.
 
 \begin{definition}[Boolean algebra]
-A Boolean algebra can be defined as a complemented distributive lattice:
+A \emph{Boolean algebra} can be defined as a complemented distributive lattice:
 \begin{itemize}
     \item[$\bullet$] Pre-order:
     $$ x \leq x, \qquad x \leq y \andd y \leq z \to x \leq z; $$
@@ -117,7 +125,7 @@ $$y^x := \bar{x} \vee y.$$
 \end{definition}
 
 \begin{definition}[Heyting algebra]
-A Heyting algebra is defined as a lattice with exponentials:
+A \emph{Heyting algebra} is defined as a lattice with exponentials:
 \begin{itemize}
     \item[$\bullet$] Pre-order;
     \item[$\bullet$] Has finite meets and joins;
@@ -169,7 +177,7 @@ The definitions provide us with standard rules:
 \end{itemize}
 
 \begin{definition}[Lindenbaum algebra]
-A Lindenbaum algebra is defined as the algebra of equivalence classes of a given theory:
+A \emph{Lindenbaum algebra} is defined as the algebra of equivalence classes of a given theory:
 \begin{itemize}
     \item[$\bullet$] $[A] = \lbrace B \mid B \equiv A \rbrace;$ 
     \item[$\bullet$] $[A] \wedge [B] := [A \wedge B];$
@@ -192,7 +200,165 @@ $\llbracket - \rrbracket_H$ denotes the interpretation of formulas as elements
 of $H$ under a valuation of propositional variables.
 \end{theorem}
 
+\newpage
 
+\section{Simple Type Theory}
 
+\begin{definition}[Simple type theory]
+    We define the \emph{simple type theory} as follows:
+
+\begin{itemize}
+    \item[$\bullet$] Unit 1:
+        \begin{center}
+        \begin{tabular}{ccc}
+        $\displaystyle \infer[1\dash F]{\Gamma \vdash 1 \ \type}{}$ 
+        &
+        $\displaystyle \infer[1 \dash I]{\Gamma \vdash \langle \rangle : 1}{}$
+        &
+        $\displaystyle \infer[\textrm{(no 1-E)}]{}{}$
+        \text{;}
+        \end{tabular}
+        \end{center}
+        
+    \item[$\bullet$] Product $\times$:
+        \begin{center}
+        \begin{tabular}{ccc}
+        $\displaystyle \infer[\times \dash F]{\Gamma \vdash A \times B \ \type}{\Gamma \vdash A \ \type & \Gamma \vdash  B \ \type}$ 
+        &
+        $\displaystyle \infer[\times \dash I]{\Gamma \vdash \langle M, N \rangle : A \times B}{\Gamma \vdash M: A & \Gamma \vdash N : B}$
+        &
+        $\displaystyle \infer[\times\text{-}E]{
+          \begin{array}{c}
+            \Gamma \vdash \fst(M) : A \\
+             \Gamma \vdash \snd(M) : B
+          \end{array}
+        }{
+          \Gamma \vdash M : A \times B
+        }$
+        \text{;}
+        \end{tabular}
+        \end{center}
+
+    \item[$\bullet$] Exponential $\to$:
+        \begin{center}
+        \begin{tabular}{ccc}
+            $\displaystyle \infer[\to \dash F]{\Gamma \vdash A \to B \ \type}{\Gamma \vdash A \ \type & \Gamma \vdash  B \ \type}$ 
+            &
+            $\displaystyle \infer[\to \dash I]{\Gamma \vdash \lambda x. M: A \to B}{\Gamma, x: A \vdash M:B}$
+            &
+        \end{tabular}
+
+        \vspace{2mm}
+
+        \begin{tabular}{c}
+            $\displaystyle \infer[\to \dash E]{\Gamma \vdash M(N):B}{\Gamma \vdash M: A \to B & \Gamma \vdash N: A}$
+            \text{;}
+        \end{tabular}
+        \end{center}
+
+    \item[$\bullet$] Void 0:
+        \begin{center}
+            \begin{tabular}{ccc}
+            $\displaystyle \infer[0\dash F]{\Gamma \vdash 0 \ \type}{}$ 
+            &
+            $\displaystyle \infer[\textrm{(no 0-I)}]{}{}$
+            &
+            $\displaystyle \infer[0\dash E]{\Gamma \vdash \abort(M) : A}{\Gamma \vdash M: 0}$ 
+            \text{;}
+            \end{tabular}
+        \end{center}
+        
+        \item[$\bullet$] Coproduct $+$:
+        \begin{center}
+        \begin{tabular}{ccc}
+        
+        $\displaystyle 
+        \infer[+\dash F]
+          {\Gamma \vdash A + B \ \type}
+          {\Gamma \vdash A \ \type 
+           & 
+           \Gamma \vdash B \ \type}
+        $
+        
+        &
+        
+        $\displaystyle
+        \infer[+\dash I_1]
+          {\Gamma \vdash \inl(M) : A + B}
+          {\Gamma \vdash M : A}
+        $
+        
+        &
+        
+        $\displaystyle
+        \infer[+\dash I_2]
+          {\Gamma \vdash \inr(N) : A + B}
+          {\Gamma \vdash N : B}
+        $
+        \text{,}
+        \\[3mm]
+        
+        \multicolumn{3}{c}{
+        $\displaystyle
+        \infer[+\text{-}E]
+          {\Gamma, z: A + B \vdash
+            \case (x.N, y. P)(z): C}
+          {
+            \Gamma, x: A \vdash N: C 
+            &
+            \Gamma, y:B \vdash P : C
+          }
+        $
+        \text{.}
+        }
+        
+        \end{tabular}
+        \end{center}
+
+\end{itemize}
+\end{definition}
+
+\begin{definition}[$\beta$ and $\eta$ equivalences]
+    \hfill
+    \begin{itemize}
+        \item Unit 1:
+        $$(\beta) \ \text{none} \qquad (\eta) \ \Gamma \vdash \langle \rangle \equiv M : 1;$$
+        \item Product $\times$:
+            $$
+            (\beta)\;
+            \begin{aligned}
+            &\Gamma \vdash \fst(\langle M, N \rangle) \equiv M : A \\
+            &\Gamma \vdash \snd(\langle M, N \rangle) \equiv N : B
+            \end{aligned}
+            \qquad
+            (\eta) \ \Gamma \vdash \langle \fst M, \snd M\rangle \equiv M : A \times B;
+            $$
+        \item Exponential $\to$:
+        $$(\beta) \ \Gamma \vdash (\lambda x. M)(N) \equiv [N / x] M: B \qquad (\eta) \ \Gamma \vdash (\lambda x. M(x)) \equiv M: A \to B;$$
+
+        \item Zero $0$:
+        $$
+        (\beta) \ \text{none} \qquad
+        (\eta)\; \Gamma, z: 0 \vdash R \equiv \abort(M) : C;
+        $$
+        
+         \item Coproduct $+$:
+        $$
+        (\beta)\;
+        \begin{aligned}
+        &\case(x.M; y.N)(\inl(P)) \equiv [P/x]M : C \\
+        &\case(x.M; y.N)(\inr(Q)) \equiv [Q/y]N : C
+        \end{aligned}
+        \text{\ ,}
+        $$
+        $$
+        \infer[(\eta)]{\Gamma, z: A + B \vdash R \equiv \case(x.M; y.N)(z)}{\Gamma \vdash [\inl(P)/z]R \equiv [P/x]M & \Gamma \vdash [\inr(Q)/z]R \equiv [Q/y]N}
+        \text{.}
+        $$
+                
+
+        
+    \end{itemize}
+\end{definition}
 
 \end{document}
