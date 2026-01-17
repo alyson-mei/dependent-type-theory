@@ -90,6 +90,9 @@
 \renewcommand{\labelitemiii}{$\bullet$} % Level 3: Bullets (default)
 \newcommand{\andd}{\mathbin{\&}}
 \newcommand{\dash}{\textrm{-}}
+\newcommand{\lb}{\llbracket}
+\newcommand{\rb}{\rrbracket}
+
 
 \title{Notes on Dependent Type Theory}
 \author{Alyson Mei}
@@ -100,6 +103,12 @@
 \maketitle
 
 These notes are based on \href{https://www.youtube.com/watch?v=y-lX1mx5_i0&list=PLt7hcIEdZLAnbUxKaG7XIynEWrozOBtXU}{video recordings} of R. Harper's lectures.
+
+\paragraph{Conventions.}
+\begin{itemize}
+    \item Bullet lists are used for strongly logically connected items (primarily in definitions), while dashed lists are used for (somewhat) distinct items;
+    \item Remarks marked with * are additions by the present author.
+\end{itemize}
 
 \section{Introduction}
 
@@ -317,6 +326,98 @@ of $H$ under a valuation of propositional variables.
 
 \end{itemize}
 \end{definition}
+
+%Diagrams for the remark below in order
+% https://q.uiver.app/#q=WzAsNSxbMCwwLCJcXEdhbW1hICJdLFswLDEsIjEiXSxbMiwwLCJcXEdhbW1hIl0sWzMsMCwiMCJdLFszLDEsIkEiXSxbMCwxLCJcXGxhbmdsZSBcXHJhbmdsZSIsMCx7InN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImRhc2hlZCJ9fX1dLFsyLDMsIk0iXSxbMyw0LCIiLDAseyJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifX19XSxbMiw0LCJcXGFib3J0KE0pIiwyXV0=
+% https://q.uiver.app/#q=WzAsOCxbMCwxLCJBIl0sWzEsMSwiQSBcXHRpbWVzIEIiXSxbMSwwLCJcXEdhbW1hIl0sWzIsMSwiQiJdLFs1LDAsIlxcR2FtbWEiXSxbNSwxLCJBIFxcdGltZXMgQiJdLFs0LDEsIkEiXSxbNiwxLCJCIl0sWzIsMCwiTSIsMl0sWzIsMywiTiJdLFsxLDAsIlxcZnN0Il0sWzIsMSwiXFxsYW5nbGUgTSwgTlxccmFuZ2xlIiwxLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV0sWzEsMywiXFxzbmQiLDJdLFs0LDUsIk0iLDFdLFs1LDYsIlxcZnN0ICJdLFs1LDcsIlxcc25kIiwyXSxbNCw2LCJcXGZzdChNKSIsMl0sWzQsNywiXFxzbmQoTSkiXV0=
+% https://q.uiver.app/#q=WzAsNSxbMSwwLCJcXEdhbW1hIFxcdGltZXMgMSJdLFsxLDEsIlxcR2FtbWEgXFx0aW1lcyAoQSArIEIpIl0sWzAsMSwiXFxHYW1tYSBcXHRpbWVzIEEiXSxbMiwxLCJcXEdhbW1hIFxcdGltZXMgQiJdLFsxLDIsIkMiXSxbMCwyLCJcXEdhbW1hIFxcdGltZXMgeCIsMl0sWzAsMywiXFxHYW1tYSBcXHRpbWVzIHkiXSxbMCwxLCJcXEdhbW1hIFxcdGltZXMgeiIsMV0sWzIsNCwiTiIsMl0sWzMsNCwiUCJdLFsxLDQsIlxcY2FzZSAoeC5OLCB5LlApKHopIiwxLHsibGFiZWxfcG9zaXRpb24iOjMwLCJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifX19XV0=
+% https://q.uiver.app/#q=WzAsNixbMSwxLCJcXEdhbW1hIl0sWzEsMCwiQSArIEIiXSxbMCwxLCJBIl0sWzQsMSwiXFxHYW1tYSJdLFszLDEsIkIiXSxbMywwLCJBICsgQiJdLFswLDIsIk0iXSxbMiwxLCJcXGlubCJdLFswLDEsIlxcaW5sKE0pIiwyXSxbMyw0LCJOIl0sWzQsNSwiXFxpbnIoTikiXSxbMyw1LCJcXGluciIsMl1d
+% https://q.uiver.app/#q=WzAsNSxbMywwLCJcXEdhbW1hIFxcdGltZXMgMSJdLFsyLDAsIlxcR2FtbWEgXFx0aW1lcyBBIl0sWzIsMSwiQiJdLFswLDAsIlxcR2FtbWEiXSxbMCwxLCJBIFxcdG8gQiJdLFswLDEsIlxcaWRfXFxHYW1tYSBcXHRpbWVzIHgiLDJdLFsxLDIsIk0iLDJdLFszLDQsIlxcbGFtYmRhIHguIE0iLDJdLFswLDJdXQ==
+
+\begin{remark}[Categorical interpretation*]
+The type theory given above corresponds to a category $\mc{C}$ that is both cartesian closed and cocartesian. We also assume that 
+$\mc{C}$ has all morphisms from the terminal object 
+$1$ to the objects corresponding to the types of context variables (this is somewhat experimental).
+
+\begin{itemize}
+    \item Types are the objects of $\mc{C}$;
+    \item A context $\Gamma = x_1:A_1, \dots, x_n: A_n$ corresponds to the product of its types, together with a morphism from the terminal object naming the variables:
+    $$
+        \Gamma := A_1 \times \dots \times A_n, \qquad \langle x_1, \dots, x_n \rangle : 1 \to \Gamma;
+    $$
+    \item Terms are morphisms in $\mc{C}$:
+    $$
+        \Gamma \vdash M:A \quad \mapsto \quad \llbracket M \rrbracket : \Gamma \to A;
+    $$
+    \item Unit $1$ is a terminal object; the 1-I rule corresponds to arrows \emph{to} $1$. Void $0$ is an initial object; the 0-E rule corresponds to arrows \emph{from} $0$:
+    \[\begin{tikzcd}
+    	{\Gamma } && \Gamma & 0 \\
+    	1 &&& A
+    	\arrow["{\langle \rangle}", dashed, from=1-1, to=2-1]
+    	\arrow["M", from=1-3, to=1-4]
+    	\arrow["{\abort(M)}"', from=1-3, to=2-4]
+    	\arrow["{\abort}", dashed, from=1-4, to=2-4]
+    \end{tikzcd}\text{;}
+    \]
+    \item Product $\times$ and coproduct $+$ are the usual categorical limits and colimits (finite in our case):
+    \[\begin{tikzcd}
+    	& \Gamma &&&& \Gamma \\
+    	A & {A \times B} & B && A & {A \times B} & B
+    	\arrow["M"', from=1-2, to=2-1]
+    	\arrow["{\langle M, N\rangle}"{description}, dashed, from=1-2, to=2-2]
+    	\arrow["N", from=1-2, to=2-3]
+    	\arrow["{\fst(M)}"', from=1-6, to=2-5]
+    	\arrow["M"{description}, from=1-6, to=2-6]
+    	\arrow["{\snd(M)}", from=1-6, to=2-7]
+    	\arrow["\fst", from=2-2, to=2-1]
+    	\arrow["\snd"', from=2-2, to=2-3]
+    	\arrow["{\fst }", from=2-6, to=2-5]
+    	\arrow["\snd"', from=2-6, to=2-7]
+    \end{tikzcd}\text{,}
+    \]
+    \[\begin{tikzcd}
+    	& {A + B} && {A + B} \\
+    	A & \Gamma && B & \Gamma
+    	\arrow["\inl", from=2-1, to=1-2]
+    	\arrow["{\inl(M)}"', from=2-2, to=1-2]
+    	\arrow["M", from=2-2, to=2-1]
+    	\arrow["{\inr(N)}", from=2-4, to=1-4]
+    	\arrow["\inr"', from=2-5, to=1-4]
+    	\arrow["N", from=2-5, to=2-4]
+    \end{tikzcd}\text{,}
+    \]
+    \[\begin{tikzcd}
+    	& {\Gamma \times 1} \\
+    	{\Gamma \times A} & {\Gamma \times (A + B)} & {\Gamma \times B} \\
+    	& C
+    	\arrow["{\Gamma \times x}"', from=1-2, to=2-1]
+    	\arrow["{\Gamma \times z}"{description}, from=1-2, to=2-2]
+    	\arrow["{\Gamma \times y}", from=1-2, to=2-3]
+    	\arrow["N"', from=2-1, to=3-2]
+    	\arrow["{\case (x.N, y.P)(z)}"{description, pos=0.3}, dashed, from=2-2, to=3-2]
+    	\arrow["P", from=2-3, to=3-2]
+    \end{tikzcd}\text{;}
+    \]
+    \item Exponential $\to$ is the right adjoint to product $\times$:
+    \[\begin{tikzcd}
+    	\Gamma && {\Gamma \times A} & {\Gamma \times 1} \\
+    	{A \to B} && B
+    	\arrow["{\lambda x. M}"', from=1-1, to=2-1]
+    	\arrow["M"', from=1-3, to=2-3]
+    	\arrow["{\id_\Gamma \times x}"', from=1-4, to=1-3]
+    	\arrow[from=1-4, to=2-3]
+    \end{tikzcd}\text{;}
+    \]
+    \[\begin{tikzcd}
+    	\Gamma & \Gamma && \Gamma \\
+    	{A \to B} & A && B
+    	\arrow["M"', from=1-1, to=2-1]
+    	\arrow["N"', from=1-2, to=2-2]
+    	\arrow["{M(N)}", from=1-4, to=2-4]
+    \end{tikzcd}\text{.}
+    \]
+\end{itemize}
+\end{remark}
 
 \begin{definition}[$\beta$ and $\eta$ equivalences]
     \hfill
