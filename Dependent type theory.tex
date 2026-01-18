@@ -76,6 +76,7 @@
 \newcommand{\inl}{\operatorname{inl}}
 \newcommand{\inr}{\operatorname{inr}}
 \newcommand{\case}{\operatorname{case}}
+\newcommand{\iter}{\operatorname{iter}}
 
 
 % Arrows
@@ -93,6 +94,9 @@
 \newcommand{\lb}{\llbracket}
 \newcommand{\rb}{\rrbracket}
 
+\newcommand{\nat}{\text{Nat}}
+\newcommand{\zero}{\text{zero}}
+\newcommand{\scc}{\text{succ}}
 
 \title{Notes on Dependent Type Theory}
 \author{Alyson Mei}
@@ -327,7 +331,7 @@ of $H$ under a valuation of propositional variables.
 \end{itemize}
 \end{definition}
 
-%Diagrams for the remark below in order
+%Diagrams for the remark below
 % https://q.uiver.app/#q=WzAsNSxbMCwwLCJcXEdhbW1hICJdLFswLDEsIjEiXSxbMiwwLCJcXEdhbW1hIl0sWzMsMCwiMCJdLFszLDEsIkEiXSxbMCwxLCJcXGxhbmdsZSBcXHJhbmdsZSIsMCx7InN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImRhc2hlZCJ9fX1dLFsyLDMsIk0iXSxbMyw0LCIiLDAseyJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifX19XSxbMiw0LCJcXGFib3J0KE0pIiwyXV0=
 % https://q.uiver.app/#q=WzAsOCxbMCwxLCJBIl0sWzEsMSwiQSBcXHRpbWVzIEIiXSxbMSwwLCJcXEdhbW1hIl0sWzIsMSwiQiJdLFs1LDAsIlxcR2FtbWEiXSxbNSwxLCJBIFxcdGltZXMgQiJdLFs0LDEsIkEiXSxbNiwxLCJCIl0sWzIsMCwiTSIsMl0sWzIsMywiTiJdLFsxLDAsIlxcZnN0Il0sWzIsMSwiXFxsYW5nbGUgTSwgTlxccmFuZ2xlIiwxLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV0sWzEsMywiXFxzbmQiLDJdLFs0LDUsIk0iLDFdLFs1LDYsIlxcZnN0ICJdLFs1LDcsIlxcc25kIiwyXSxbNCw2LCJcXGZzdChNKSIsMl0sWzQsNywiXFxzbmQoTSkiXV0=
 % https://q.uiver.app/#q=WzAsNSxbMSwwLCJcXEdhbW1hIFxcdGltZXMgMSJdLFsxLDEsIlxcR2FtbWEgXFx0aW1lcyAoQSArIEIpIl0sWzAsMSwiXFxHYW1tYSBcXHRpbWVzIEEiXSxbMiwxLCJcXEdhbW1hIFxcdGltZXMgQiJdLFsxLDIsIkMiXSxbMCwyLCJcXEdhbW1hIFxcdGltZXMgeCIsMl0sWzAsMywiXFxHYW1tYSBcXHRpbWVzIHkiXSxbMCwxLCJcXEdhbW1hIFxcdGltZXMgeiIsMV0sWzIsNCwiTiIsMl0sWzMsNCwiUCJdLFsxLDQsIlxcY2FzZSAoeC5OLCB5LlApKHopIiwxLHsibGFiZWxfcG9zaXRpb24iOjMwLCJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifX19XV0=
@@ -347,7 +351,7 @@ $1$ to the objects corresponding to the types of context variables (this is some
     $$
     \item Terms are morphisms in $\mc{C}$:
     $$
-        \Gamma \vdash M:A \quad \mapsto \quad \llbracket M \rrbracket : \Gamma \to A;
+        \Gamma \vdash M:A \quad \mapsto \quad   M : \Gamma \to A;
     $$
     \item Unit $1$ is a terminal object; the 1-I rule corresponds to arrows \emph{to} $1$. Void $0$ is an initial object; the 0-E rule corresponds to arrows \emph{from} $0$:
     \[\begin{tikzcd}
@@ -394,29 +398,36 @@ $1$ to the objects corresponding to the types of context variables (this is some
     	\arrow["{\Gamma \times z}"{description}, from=1-2, to=2-2]
     	\arrow["{\Gamma \times y}", from=1-2, to=2-3]
     	\arrow["N"', from=2-1, to=3-2]
-    	\arrow["{\case (x.N, y.P)(z)}"{description, pos=0.3}, dashed, from=2-2, to=3-2]
+    	\arrow["{\case (x.N, y.P)}"{description, pos=0.3}, dashed, from=2-2, to=3-2]
     	\arrow["P", from=2-3, to=3-2]
     \end{tikzcd}\text{;}
     \]
     \item Exponential $\to$ is the right adjoint to product $\times$:
-    \[\begin{tikzcd}
-    	\Gamma && {\Gamma \times A} & {\Gamma \times 1} \\
-    	{A \to B} && B
-    	\arrow["{\lambda x. M}"', from=1-1, to=2-1]
-    	\arrow["M"', from=1-3, to=2-3]
-    	\arrow["{\id_\Gamma \times x}"', from=1-4, to=1-3]
-    	\arrow[from=1-4, to=2-3]
+    $$(A \times -) \dashv (A \to -)$$
+    \[\begin{tikzcd}[sep=scriptsize]
+        \Gamma && {\Gamma \times A} & {\Gamma \times 1} \\
+        {A \to B} && B
+        \arrow["{\lambda x. M}"', from=1-1, to=2-1]
+        \arrow["M"', from=1-3, to=2-3]
+        \arrow["{\id_\Gamma \times x}"', from=1-4, to=1-3]
+        \arrow["{M \circ \id_\Gamma \times x}", from=1-4, to=2-3]
     \end{tikzcd}\text{;}
     \]
     \[\begin{tikzcd}
-    	\Gamma & \Gamma && \Gamma \\
-    	{A \to B} & A && B
-    	\arrow["M"', from=1-1, to=2-1]
-    	\arrow["N"', from=1-2, to=2-2]
-    	\arrow["{M(N)}", from=1-4, to=2-4]
-    \end{tikzcd}\text{.}
+        \Gamma & \Gamma && \Gamma \\
+        {A \to B} & A && {A \times (A \to B)} & B
+        \arrow["M"', from=1-1, to=2-1]
+        \arrow["N"', from=1-2, to=2-2]
+        \arrow["{\langle M, N \rangle}"', from=1-4, to=2-4]
+        \arrow["{\varepsilon_B \circ \langle M, N   \rangle}", from=1-4, to=2-5]
+            \arrow["{\varepsilon_B}"', from=2-4, to=2-5]
+        \end{tikzcd}\text{.}
     \]
 \end{itemize}
+\end{remark}
+
+\begin{remark}[Categorical notation*] Formally, we should've been writing $1 \to \Gamma$ instead of just $\Gamma$ for each diagram. But for brevity, we explicitly defined only those variables that are mentioned in the type definitions. Maybe I will refine this later.
+    
 \end{remark}
 
 \begin{definition}[$\beta$ and $\eta$ equivalences]
@@ -456,10 +467,74 @@ $1$ to the objects corresponding to the types of context variables (this is some
         \infer[(\eta)]{\Gamma, z: A + B \vdash R \equiv \case(x.M; y.N)(z)}{\Gamma \vdash [\inl(P)/z]R \equiv [P/x]M & \Gamma \vdash [\inr(Q)/z]R \equiv [Q/y]N}
         \text{.}
         $$
-                
-
-        
     \end{itemize}
 \end{definition}
+
+%18.01.2026
+
+Next, we're going to augument this STT with "data" types.
+
+\begin{definition}[Natural numbers type]
+    The \emph{natural numbers type} is defined as follows:
+    \begin{itemize}
+        \item[$\bullet$]  Introduction: $\zero$ is a $\nat$, $\scc(x: \nat)$ is a $\nat$:
+        \begin{center}
+            \begin{tabular}{cc}
+            $\displaystyle \infer{\Gamma \vdash \zero: \nat}{}$ 
+            &
+            $\displaystyle \infer{\Gamma, x: \nat \vdash \scc(x): \nat}{}$
+            \text{;}
+            \end{tabular}
+        \end{center}
+        \item[$\bullet$] Elimination: 
+         \begin{center}
+            \begin{tabular}{c}
+
+            $\displaystyle \infer{\Gamma, z: \nat \vdash \iter(M, x.N)(z) : C}{\Gamma \vdash M:C & \Gamma, x: C \vdash N: C}$
+            \text{,}
+            \end{tabular}
+        \end{center}
+        given by the recursion:
+        $$\iter(M, x.N)(\zero) = M, \qquad \iter(M, x.N)(\scc(n)) = [\iter(M, x.N)(n)/x]N.$$
+    \end{itemize}
+    
+    Note: $(\eta)$ here is not easy to formulate, because it would require $\omega$-rule.
+
+    (next there were brief comments by R.Harper about inductive types and categorical notation)
+\end{definition}
+
+\begin{remark}[Explaining the iter*]
+    Given $M \in C$, $f \in \Hom(C, C)$ and $z \in \mathbb{N}$, $\iter$ essentially applies function $f$ to $M$ $z$ times: 
+    $$\iter: C \times \Hom(C, C) \times \mathbb{N} \to C, \qquad \iter: (M, f, z) \mapsto f_{(z)}(...(f_{(1)}(M))).$$
+    The recursion takes the following form:
+    $$\iter(M, f, 0) = M, \qquad \iter(M, f, \scc(n)) = f(\iter(M, f, n)).$$
+\end{remark}
+
+\begin{remark}[Natural numbers object*]
+    In a category $\mc{C}$ with a terminal object $1$, a \emph{natural number object (NNO)} $$(N, z: 1 \to N, s: N \to N)$$ is an initial object in the category induced by morphisms $a: (x, g) \to (y, h):$
+    % https://q.uiver.app/#q=WzAsMTAsWzAsMCwiMSJdLFsxLDAsIlgiXSxbMiwwLCJYIl0sWzEsMSwiWSJdLFsyLDEsIlkiXSxbNCwwLCIxIl0sWzUsMCwiTiJdLFs2LDAsIk4iXSxbNSwxLCJBIl0sWzYsMSwiQSJdLFswLDEsIngiXSxbMSwzLCJhIl0sWzEsMiwiZyJdLFszLDQsImgiLDJdLFsyLDQsImEiXSxbMCwzLCJ5IiwyXSxbNSw2LCJ6Il0sWzYsOCwidSIsMCx7InN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImRhc2hlZCJ9fX1dLFs2LDcsInMiXSxbOCw5LCJmIiwyXSxbNyw5LCJ1IiwwLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV0sWzUsOCwicSIsMl1d
+    \[\begin{tikzcd}
+        1 & X & X && 1 & N & N \\
+        & Y & Y &&& A & A
+        \arrow["x", from=1-1, to=1-2]
+        \arrow["y"', from=1-1, to=2-2]
+        \arrow["g", from=1-2, to=1-3]
+        \arrow["a", from=1-2, to=2-2]
+        \arrow["a", from=1-3, to=2-3]
+        \arrow["z", from=1-5, to=1-6]
+        \arrow["q"', from=1-5, to=2-6]
+        \arrow["s", from=1-6, to=1-7]
+        \arrow["u", dashed, from=1-6, to=2-6]
+        \arrow["u", dashed, from=1-7, to=2-7]
+        \arrow["h"', from=2-2, to=2-3]
+        \arrow["f"', from=2-6, to=2-7]
+    \end{tikzcd}
+    \text{.}
+    \]
+\end{remark}
+
+\newpage
+
+\section{Families of types}
 
 \end{document}
