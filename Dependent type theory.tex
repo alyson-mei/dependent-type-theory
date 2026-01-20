@@ -533,8 +533,20 @@ Next, we're going to augument this STT with "data" types.
     \]
 \end{remark}
 
+\begin{example}[Addition for $\nat$]
+    We define $\text{plus}: \nat \to \nat \to \nat$ as:
+    $$\lambda x \lambda y. \iter(x, x'.\scc(x'))(y)$$
+\end{example}
+
 \newpage
 
 \section{Families of types}
+
+Motivation: Propositions as Types:
+\begin{itemize}
+    \item  Proposition $\sim$ Type,
+    \item Predicate ("propositional function") $\sim$ Family of types ("typical function")
+\end{itemize}
+
 
 \end{document}
